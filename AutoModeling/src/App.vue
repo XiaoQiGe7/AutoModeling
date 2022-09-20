@@ -1,12 +1,11 @@
 <script setup lang="ts">
+import {nextTick} from "vue"
 import * as THREE from "three";
 // FPS
-import Stats from "three/addons/libs/stats.module.js";
+// import Stats from "three/addons/libs/stats.module.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import room from "./assets/testData/room.json"
-let renderer, stats, scene, camera;
-let VX = 30,
-  VY = 10;
+import room from "./assets/test/room.json"
+let renderer, scene, camera;
 function init() {
   const container = document.getElementById("container");
 
@@ -89,12 +88,16 @@ function animate() {
 function render() {
   renderer.render(scene, camera);
 }
-init();
+nextTick(() => {
+  init();
 animate();
+})
 </script>
 
 <template>
-<div id="Map"></div>
+<div id="Map">
+  <div id="container"></div>
+</div>
 </template>
 
 <style scoped>

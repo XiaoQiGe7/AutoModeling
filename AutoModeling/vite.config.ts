@@ -5,21 +5,21 @@ import {resolve} from "path"
 export default defineConfig({
   plugins: [vue()],
   base:'./',
-  resolve: {
-    alias: [
-      { find: "@", replacement: resolve(__dirname, "./src") }
-    ]
-  },
+  // resolve: {
+  //   alias: [
+  //     { find: "@", replacement: resolve(__dirname, "./src") }
+  //   ]
+  // },
   server: {
     host: "localhost",
-    port: "6998",
+    port: 6998,
     open: true,
-    // proxy: {
-    //   '/api': {
-    //     // target: "http://localhost:80/",
-    //     changeOrigin: true,
-    //     rewrite: (path) => path.replace(/api/, '')
-    //   }
-    // }
+    proxy: {
+      '/api': {
+        // target: "http://localhost:80/",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/api/, '')
+      }
+    }
   },
 })
