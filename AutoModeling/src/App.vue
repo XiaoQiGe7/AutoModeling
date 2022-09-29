@@ -1,60 +1,12 @@
 <script setup lang="ts">
-import {nextTick} from "vue"
+import { nextTick } from "vue";
 import * as THREE from "three";
 // FPS
 // import Stats from "three/addons/libs/stats.module.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import room from "./assets/test/room.json"
+import room from "./assets/test/room.json";
+import storeys from "./assets/test/DS.json"
 let renderer, scene, camera;
-function init() {
-  const container = document.getElementById("container");
-
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xffffff);
-
-  camera = new THREE.PerspectiveCamera(
-    500,
-    window.innerWidth / window.innerHeight,
-    1,
-    10000
-  );
-  camera.position.set(0, 10, 1000);
-  // createLight()
-  // 坐标系
-
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  container.appendChild(renderer.domElement);
-  createPoint()
-  // // 拉伸配置
-
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.minDistance = 100;
-  controls.maxDistance = 1000;
-
-  // window.addEventListener('resize', onWindowResize);
-}
-function createLight(){
-  // 定向光
-  const directionalLight = new THREE.DirectionalLight(0xf9f9f9, 0.6);
-  directionalLight.position.set(0.75, 0.75, 1.0).normalize();
-  scene.add(directionalLight);
-  // 环境光
-  const ambientLight = new THREE.AmbientLight(0xcccccc, 0.2);
-  scene.add(ambientLight);
-
-}
-function createPoint(){
-  const len = room.room.length
-  for (let i = 0; i < len; i++) {
-    const points = [];
-    for(let item of room.room[i]){
-      points.push(new THREE.Vector2(item[0],item[1]))
-    }
-    createMesh(points);
-  }
-}
 const extrudeSettings = {
   // amount: 10, //?
   curveSegments: 12, //整数。曲线上的点数。默认值为 12。
@@ -68,17 +20,90 @@ const extrudeSettings = {
   // extrudePath:    //三曲线。应沿其拉伸形状的 3D 样条路径。路径拉伸不支持斜角。
   // UVGenerator:    //对象。提供 UV 生成器功能的对象
 };
-function createMesh(points) {
-  console.log(points)
+function init() {
+  const container = document.getElementById("container");
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xffffff);
+  // 何为相机？https://threejs.org/examples/#webgl_camera
+  camera = new THREE.PerspectiveCamera(
+    60,
+    window.innerWidth / window.innerHeight,
+    1,
+    10000
+  );
+  camera.lookAt(new THREE.Vector3(0,0,0))
+  // camera.position.z = 3000
+  camera.position.set(0, 10, 3000);
+  createLight()
+  // 坐标系
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  container.appendChild(renderer.domElement);
+  // createRoom(storeys[0].rooms);
+  createStorey(scene)
+  // // 拉伸配置
+
+  // 轨道控制器https://threejs.org/docs/index.html#examples/zh/controls/OrbitControls
+  const controls = new OrbitControls(camera, renderer.domElement);
+  // 
+  controls.minDistance = 100;
+  controls.maxDistance = 3000;
+
+  // window.addEventListener('resize', onWindowResize);
+}
+function createLight() {
+  // 定向光
+  const directionalLight = new THREE.DirectionalLight(0xf9f9f9, 0.6);
+  directionalLight.position.set(0.75, 0.75, 1.0).normalize();
+  scene.add(directionalLight);
+  // 环境光
+  const ambientLight = new THREE.AmbientLight(0xcccccc, 0.2);
+  scene.add(ambientLight);
+}
+function createStorey(obj3D){
+  const points = []
+  const len = storeys.length
+  for(let i = 0;i < len;i ++){
+    for (let item of storeys[i].points) {
+      const v3 = new THREE.Vector2(item[0], item[1])
+      points.push(v3);
+    }
+    extrudeSettings.depth = 300
+    const storey = createMesh(points,{
+      color: storeys[i].color,
+      opacity:0.1,
+      transparent: true,
+    })
+    storey.position.set(0,0,i * 300)
+    createRoom(storey,storeys[0].rooms)
+    obj3D.add(storey)
+  }
+}
+function createRoom(obj3D,rooms) {
+  const len = rooms.length;
+  extrudeSettings.depth = 100
+  for (let i = 0; i < len; i++) {
+    const points = [];
+    for (let item of rooms[i].points) {
+      points.push(new THREE.Vector2(item[0], item[1]));
+    }
+    const room = createMesh(points,{
+    color: rooms[i].color,
+    // transparent: true,
+  });
+    obj3D.add(room)
+  }
+}
+
+function createMesh(points,material) {
   const Shape = new THREE.Shape(points);
   const geometry = new THREE.ExtrudeGeometry(Shape, extrudeSettings);
-  const material = new THREE.MeshBasicMaterial({
-    color: 0xffaa00,
-    // transparent: true,
-    // wireframe:true
-  });
-  const mesh = new THREE.Mesh(geometry, material);
-  scene.add(mesh);
+  // const material = new THREE.MeshBasicMaterial();
+  const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial(material));
+  return mesh
 }
 function animate() {
   requestAnimationFrame(animate);
@@ -88,16 +113,16 @@ function animate() {
 function render() {
   renderer.render(scene, camera);
 }
-nextTick(() => {
+nextTick(function () {
   init();
-animate();
-})
+  animate();
+});
 </script>
 
 <template>
-<div id="Map">
-  <div id="container"></div>
-</div>
+  <div id="Map">
+    <div id="container"></div>
+  </div>
 </template>
 
 <style scoped>
