@@ -22,3 +22,9 @@
     },
     {}
 ]
+
+
+geometry
+Geometry
+loader
+TextureLoader 文件加载器
