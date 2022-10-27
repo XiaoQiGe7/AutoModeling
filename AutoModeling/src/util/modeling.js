@@ -8,7 +8,7 @@ import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 
 const img = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAEdElEQVRIicWUz4uXVRTGn3Pufd/364w6zgyaGYYkQqFo+DNBagxyxEUbGRGk/oAIaSEVMuLbD8NSF2IGQSQtXKjYIjFt5ZfRRSBJComhC9GaNEHT+fH9vt9773laOBNqim6i590d7j2f5zz38AL/sWTF0S3LPFyiqmgBa10cmZAuDs8QUWdqZKTwKZw4/e4X1+69uOSzt6bLdawUL1RTIS25ORMH8zntDaugYsaI5Hzm8jc00w3WSkFa0HxmWzZ65vbk9McI4AH1Gey3cBhluQ71ugIAenqMP13+XJmttRhgEdCna8hntt2RFoICprUsk+D2a1LstmDRFdlUQrq15ifnCzpoo4E2nCzdakQX/Nql1wfXo16PqNfj0uuD613wa9OtRrThZDYamC/ooNb8ZEK6XZFNtWAxKXYLALx8/IP38iLfnpohCOGYqzS++x3hlyFKoUnFOZuIn7MZU1YAQBj865QO40VjSqzMZXMnyYTXn4G0jFRJrpZlrWb1/sDqrZ8qANGCe1Mz/OqKLKMIQSBf3g2ZqIrEzFKgr/zC1BzdyOboRl/5hZYCkZhJu2q+vBsgQBFq5rLUqM5qwb0AxAGQy9/UW7M2vHoN4DohAYNoRw42DXZ5BMicsEoGYgUb9gqHgsKJsmXIl3YjnzcFCISAACAA366/Vp4FIArcrdbXbDlsMR3TWq4gTIJJvqgTMrUAWyZwcLgd2nA7tMHBMZi46TXkizohwQSEaS1Xi+nYid6t344tG3V8XQEwKfsZ4h3xIkhmrt1LvqQTEJAgqCAVJAkImC+eAtfuBclMvAhDvJOU/WOjCACMA4gSenJ1eSbFtM9NyJUixkjm8zrEPdcmrAwCEYEIWwY3q02yFzqEkaSIuQm5ppj2nVxdnkGJf5IZBwBb71LNuV1xqHFF88yBMPHK2uIuSKHg2CeForakC5IpQZjmmYtDjSvm3C4AMtYL9wMERFnKQG//VXPYDlAEFEbCzZ7EbH4H2CLYIrL5HXCzJ5GREFAAijlsH+jtv4qylPHXHs/+fhEClNJzXH/0RbYkVTHBw/FmiyP7rwgAtG94ltKVCyKSK7yLVThdX20vASXvbX7/BPf9oUoz1U0kKlEBA6nTCsmWdTJb1kmdVggDKSIgUZnqJkhpD2v1b4DcffCBVfFUDOGAby9UFYFNQ7GwS4qFXcKmQVWCby9cDOHAwKp4CiX0QfcPj2g8JgF7fvjkeWE86bzvSiERMmaIMM2cWEx/UtzKeu/mC+N3Hj/BPVPUezdfIO0rOFURgCRIQgQQFWWyL+u9my88yv2jAQBQwgDIzRvDH6dGdV68cyJiImLinUvN1vmbfmgHABk7+1A9GnA3Cpx7c+dIUtkmXk0wtpNeLalsO9e7c+Thvp8UICD6+tyg3TgcG9URLbzXwvvYqI4M2o3D6Otzj4rmyQAAcHAuL63ZUyWX7bBolUWrkst2XFqzp8LBuY/x/6Tq63MA0HP0w30rv//o63trj5N/IsChQwkAhkbydx6s/e/6G2v2U2q+xYI8AAAAAElFTkSuQmCC"
 let renderer, scene, camera ,controls;
-let storeyHeight = 300,floorHeight = 10,roomHeight = 100
+// let storeyHeight = 300,floorHeight = 10,roomHeight = 100
 const config = {
   storeyHeight:300,
   floorHeight:10,
@@ -36,7 +36,7 @@ export function init(storeys) {
   camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 5000);
   camera.lookAt(new THREE.Vector3(0,0,0))
   camera.position.set(0, -1000, 1000);
-  createLight()
+  // createLight()
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);
@@ -47,12 +47,14 @@ export function init(storeys) {
   // 轨道控制器：围绕 x y 轴旋转
   // 轨迹球：围绕 x z 轴旋转
   // https://threejs.org/docs/index.html#examples/zh/controls/OrbitControls
-  controls = new OrbitControls(camera, renderer.domElement);
+  controls = new TrackballControls(camera, renderer.domElement);
   // 
   controls.target.set( 0, 25, 0 );
   controls.update();
 
   // window.addEventListener('resize', onWindowResize);
+}
+function loadImg(){
   const texture = new THREE.TextureLoader().load(img,function (data) {
     let width = data.image.width || 20
     let height = data.image.height || 20
@@ -76,19 +78,21 @@ function createStorey(obj3D,storeys){
   const len = storeys.length
   const group = new THREE.Group()
   for(let i = 0;i < len;i ++){
-    const points = []
-    for (let item of storeys[i].points) {
+    const Vpoints = []
+    const {points,storeyHeight,floorHeight,color} = storeys[i]
+    for (let item of points) {
       const v3 = new THREE.Vector2(item[0], item[1])
-      points.push(v3);
+      Vpoints.push(v3);
     }
     extrudeSettings.depth = floorHeight
-    const storey = createMesh(points,{
-      color: storeys[i].color,
+    const storey = createMesh(Vpoints,{
+      color: color,
       // opacity:0.5,
       // transparent: true,
     })
-    storey.position.set(0,0,i * storeyHeight)
+    storey.position.set(0,0,(i * storeyHeight))
     // createRoom(group,storeys[i].rooms)
+    console.log(storey)
     group.add(storey)
   }
   obj3D.add(group)

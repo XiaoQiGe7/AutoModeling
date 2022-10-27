@@ -1,6 +1,7 @@
 [
     {
         "color": "#049ef4",
+        "height":300,
         "storeyName": "测试楼层",
         "points": [
             [
@@ -27,6 +28,9 @@
         "rooms": [
             {
                 "color": "#ffaa99",
+                "id":"",
+                "logo":"",
+                "name":"",
                 "points": [
                     [
                         -1291.4543739687813,

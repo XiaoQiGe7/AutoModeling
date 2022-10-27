@@ -1,20 +1,12 @@
-# Vue 3 + TypeScript + Vite
+问题：
+TS规范
+鼠标控制相机，不是现在的轨道运动，应该是无限制 x 围绕 ，z = 模型 / 2
+图片大小，暂时不管，室内模型做完再说
+没有负数的坐标系，非常严重
+点击其他已编辑的层时清除画布后没有绘制该层图形
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
-
-## Type Support For `.vue` Imports in TS
-
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
-
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
-
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
-
-```
-2D转3D
-解决切换3D时添加多个场景的问题
+计划：
+可以拖动的画布，比如右边画了一个区域，鼠标按住向右拉动，这时区域会向右边移动，这时候就可以在左边的空白区域画画
+操作栈：用于记录操作，当用户误操作时可以回退至上一次操作
+笛卡尔坐标系
+差异对比：如果一个房间稍微更改就重新渲染整个场景是极其消耗性能的，我们需要精确到房间内的点
