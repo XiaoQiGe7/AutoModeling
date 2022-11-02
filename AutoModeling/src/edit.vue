@@ -25,12 +25,12 @@
       <ul v-show="edit.isEditStorey" class="storey-edit">
         <li>层名：<input type="text" v-model="edit.storey.name"></li>
         <li>颜色：<input type="text" v-model="edit.storey.color"></li>
-        <li>层高：<input type="text" v-model="edit.storey.storeyHeight"></li>
-        <li>地板高：<input type="text" v-model="edit.storey.floorHeight"></li>
+        <li>层高：<input type="number" v-model="edit.storey.storeyHeight"></li>
+        <li>地板高：<input type="number" v-model="edit.storey.floorHeight"></li>
         <li>新建楼层是是否使用该地板：<input type="checkbox" v-model="edit.isCopyFloor"></li>
         <li>
           <button @click="editRoom">编辑房间</button>
-          <button>保存</button>
+          <button @click="edit.isEditRoom = true">保存</button>
         </li>
       </ul>
     </div>
@@ -81,7 +81,6 @@ function clickCanvas(e) {
 }
 function transform3D(){
   edit.is3D = !edit.is3D
-  console.log(edit.storeys)
   saveData()
   nextTick(() => {
     if(edit.is3D){
@@ -90,10 +89,14 @@ function transform3D(){
     }
   })
 }
-function clickStorey(points){
+function clickStorey(storey){
   clearCanvas()
+  let {points,rooms} = storey
   editPoints = points
   draw(points)
+  for(let r of rooms){
+    draw(r.points)
+  }
 }
 function saveData(){
   localStorage.setItem('data',JSON.stringify(edit.storeys))
@@ -129,7 +132,7 @@ function editStorey(storey,i){
   // edit.storey = edit.storeys[inx]
   edit.storey = storey
   inx = i
-  clickStorey(storey.points)
+  clickStorey(storey)
 }
 function delStorey(inx){
   edit.storeys.splice(inx,1)
