@@ -27,6 +27,19 @@ export function drawLine(points) {
         cxt.stroke();
     }
 }
+export function draw(points){
+    const len = points.length
+    if(len <= 0) return
+    cxt.beginPath()
+    cxt.moveTo(points[0][0],points[0][1])
+    for(let i = 0;i < len;i ++){
+        cxt.lineTo(points[i][0],points[i][1])
+    }
+    cxt.stroke()
+}
+export function drawCircle(){
+
+}
 export function clearCanvas(){
     cxt.clearRect(0,0,Cwidth,Cheight)
     cxt.beginPath();

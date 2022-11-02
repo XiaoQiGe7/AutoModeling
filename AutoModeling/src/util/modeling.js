@@ -8,6 +8,7 @@ import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 
 const img = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAEdElEQVRIicWUz4uXVRTGn3Pufd/364w6zgyaGYYkQqFo+DNBagxyxEUbGRGk/oAIaSEVMuLbD8NSF2IGQSQtXKjYIjFt5ZfRRSBJComhC9GaNEHT+fH9vt9773laOBNqim6i590d7j2f5zz38AL/sWTF0S3LPFyiqmgBa10cmZAuDs8QUWdqZKTwKZw4/e4X1+69uOSzt6bLdawUL1RTIS25ORMH8zntDaugYsaI5Hzm8jc00w3WSkFa0HxmWzZ65vbk9McI4AH1Gey3cBhluQ71ugIAenqMP13+XJmttRhgEdCna8hntt2RFoICprUsk+D2a1LstmDRFdlUQrq15ifnCzpoo4E2nCzdakQX/Nql1wfXo16PqNfj0uuD613wa9OtRrThZDYamC/ooNb8ZEK6XZFNtWAxKXYLALx8/IP38iLfnpohCOGYqzS++x3hlyFKoUnFOZuIn7MZU1YAQBj865QO40VjSqzMZXMnyYTXn4G0jFRJrpZlrWb1/sDqrZ8qANGCe1Mz/OqKLKMIQSBf3g2ZqIrEzFKgr/zC1BzdyOboRl/5hZYCkZhJu2q+vBsgQBFq5rLUqM5qwb0AxAGQy9/UW7M2vHoN4DohAYNoRw42DXZ5BMicsEoGYgUb9gqHgsKJsmXIl3YjnzcFCISAACAA366/Vp4FIArcrdbXbDlsMR3TWq4gTIJJvqgTMrUAWyZwcLgd2nA7tMHBMZi46TXkizohwQSEaS1Xi+nYid6t344tG3V8XQEwKfsZ4h3xIkhmrt1LvqQTEJAgqCAVJAkImC+eAtfuBclMvAhDvJOU/WOjCACMA4gSenJ1eSbFtM9NyJUixkjm8zrEPdcmrAwCEYEIWwY3q02yFzqEkaSIuQm5ppj2nVxdnkGJf5IZBwBb71LNuV1xqHFF88yBMPHK2uIuSKHg2CeForakC5IpQZjmmYtDjSvm3C4AMtYL9wMERFnKQG//VXPYDlAEFEbCzZ7EbH4H2CLYIrL5HXCzJ5GREFAAijlsH+jtv4qylPHXHs/+fhEClNJzXH/0RbYkVTHBw/FmiyP7rwgAtG94ltKVCyKSK7yLVThdX20vASXvbX7/BPf9oUoz1U0kKlEBA6nTCsmWdTJb1kmdVggDKSIgUZnqJkhpD2v1b4DcffCBVfFUDOGAby9UFYFNQ7GwS4qFXcKmQVWCby9cDOHAwKp4CiX0QfcPj2g8JgF7fvjkeWE86bzvSiERMmaIMM2cWEx/UtzKeu/mC+N3Hj/BPVPUezdfIO0rOFURgCRIQgQQFWWyL+u9my88yv2jAQBQwgDIzRvDH6dGdV68cyJiImLinUvN1vmbfmgHABk7+1A9GnA3Cpx7c+dIUtkmXk0wtpNeLalsO9e7c+Thvp8UICD6+tyg3TgcG9URLbzXwvvYqI4M2o3D6Otzj4rmyQAAcHAuL63ZUyWX7bBolUWrkst2XFqzp8LBuY/x/6Tq63MA0HP0w30rv//o63trj5N/IsChQwkAhkbydx6s/e/6G2v2U2q+xYI8AAAAAElFTkSuQmCC"
 let renderer, scene, camera ,controls;
+let Cwidth = window.innerWidth / 2, Cheight = window.innerHeight / 2
 // let storeyHeight = 300,floorHeight = 10,roomHeight = 100
 const config = {
   storeyHeight:300,
@@ -35,8 +36,8 @@ export function init(storeys) {
   // 何为相机？https://threejs.org/examples/#webgl_camera
   camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 5000);
   camera.lookAt(new THREE.Vector3(0,0,0))
-  camera.position.set(0, -1000, 1000);
-  // createLight()
+  camera.position.set(0, -1000, 500);
+  createLight()
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);
@@ -81,7 +82,7 @@ function createStorey(obj3D,storeys){
     const Vpoints = []
     const {points,storeyHeight,floorHeight,color} = storeys[i]
     for (let item of points) {
-      const v3 = new THREE.Vector2(item[0], item[1])
+      const v3 = new THREE.Vector2(item[0] - Cwidth, item[1] - Cheight)
       Vpoints.push(v3);
     }
     extrudeSettings.depth = floorHeight
@@ -91,25 +92,25 @@ function createStorey(obj3D,storeys){
       // transparent: true,
     })
     storey.position.set(0,0,(i * storeyHeight))
-    // createRoom(group,storeys[i].rooms)
+    createRoom(group,storeys[i].rooms,storeyHeight,floorHeight)
     console.log(storey)
     group.add(storey)
   }
   obj3D.add(group)
 }
-function createRoom(obj3D,rooms) {
+function createRoom(obj3D,rooms,storeyHeight,floorHeight) {
   const len = rooms.length;
-  extrudeSettings.depth = roomHeight
   for (let i = 0; i < len; i++) {
     const points = [];
+    extrudeSettings.depth = rooms[i].roomHeight
     for (let item of rooms[i].points) {
-      points.push(new THREE.Vector2(item[0], item[1]));
+      points.push(new THREE.Vector2(item[0] - Cwidth, item[1] - Cheight));
     }
     const room = createMesh(points,{
-    color: rooms[i].color,
-    // transparent: true,
-  });
-  room.position.set(0,0,(i * storeyHeight) + floorHeight)
+      color: rooms[i].color,
+      // transparent: true,
+    });
+    room.position.set(0,0,(i * storeyHeight) + floorHeight)
     obj3D.add(room)
   }
 }
